@@ -4,7 +4,7 @@ export interface Category {
   answers: Answer[];
 }
 
-interface Answer {
+export interface Answer {
   text: string;
   obscurityScore: 1 | 2 | 3;
 }
