@@ -11,6 +11,8 @@ export default function Game(){
     const [remainingAnswers, setRemainingAnswers] = useState<Answer[]>(category.answers)
     const [totalScore, setTotalScore] = useState(0)
     const [foundAnswers, setFoundAnswers] = useState<Answer[]>([])
+    const [timer, setTimer] = useState(60)
+    const [isGameOver, setIsGameOver] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -18,12 +20,27 @@ export default function Game(){
         inputRef.current?.focus();
     }, [])
 
+    useEffect(() => {
+        if (timer <= 0 || remainingAnswers.length === 0){
+            setIsGameOver(true)
+            return
+        }
+
+        const interval = setInterval(() => {
+            setTimer(prev => prev - 1)
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [timer, remainingAnswers.length])
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if(isGameOver) return
         const inputValue = e.target.value.toLowerCase().trim()
 
         const foundAnswer = remainingAnswers.find(answer => 
             answer.text.toLowerCase() === inputValue
         )
+        
 
         if(foundAnswer){
             setTotalScore(totalScore + foundAnswer.obscurityScore)
@@ -35,17 +52,28 @@ export default function Game(){
 
     return(
         <div>
-            <h1>Category is {category.name}</h1>
-            <p>What are the answers?</p>
-            <input type="text" ref={inputRef} onChange={handleChange}/>
-            <p>Total score: {totalScore}</p>
-            
-            {foundAnswers.map(answer => (
-                <div className="display-answers">
-                    <p key={answer.text}>{answer.text}</p>
-                    <p key={answer.obscurityScore}>{answer.obscurityScore}</p>
+            <h2>Time: {timer}s</h2>
+            <h1>Category: {category.name}</h1>
+            {isGameOver ? (
+                <div>
+                    <h2>Game Over!</h2>
+                    <p>Final Score: {totalScore}</p>
+                    <p>Found {foundAnswers.length} out of {answers.length} answers</p>
                 </div>
-            ))}
+            ) : (
+                <>
+                    <p>What are the answers?</p>
+                    <input type="text" ref={inputRef} onChange={handleChange}/>
+                    <p>Score: {totalScore}</p>
+                    
+                    {foundAnswers.map(answer => (
+                        <div className="display-answers" key={answer.text}>
+                            <p>{answer.text}</p>
+                            <p>{answer.obscurityScore}</p>
+                        </div>
+                    ))}
+                </>
+            )}
         </div>
     )
     
