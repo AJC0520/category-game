@@ -38,6 +38,9 @@ io.on("connection", (socket) => {
 
         socket.join(code)
         socket.emit("lobbyCreated", code)
+
+        const lobby = gameRooms.get(code)
+        io.to(code).emit("playersUpdated", lobby.players)
     })
 
     socket.on("joinLobby", (code) => {
@@ -46,8 +49,19 @@ io.on("connection", (socket) => {
         return
       }
       
+      const lobby = gameRooms.get(code)
+      
+      const existingPlayer = lobby.players.find(p => p.id == socket.id)
+      if(!existingPlayer){
+        lobby.players.push({
+          id: socket.id,
+          name: `Player ${lobby.players.length + 1}`
+        })
+      }
       socket.join(code)
       socket.emit("lobbyJoined", code)
+
+      io.to(code).emit("playersUpdated", lobby.players)
     })
 })
 

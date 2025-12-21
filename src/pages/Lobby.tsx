@@ -10,6 +10,8 @@ type Player = {
 export default function Lobby() {
     const { code } = useParams<{ code: string}>()
     const navigate = useNavigate()
+    const [players, setPlayers] = useState<Player[]>([])
+
 
     useEffect(() => {
         socket.emit("joinLobby", code)
@@ -19,13 +21,27 @@ export default function Lobby() {
             navigate("/")
         })
 
+        socket.on("playersUpdated", (updatedPlayers) => {
+            setPlayers(updatedPlayers)
+        })
+
         return () => {
             socket.off("lobbyNotFound")
+            socket.off("playersUpdated")
         }
     }, [code, navigate])
     return(
         <div>
-            <h1>{code}</h1>
+            <h1>Category game</h1>
+            <h2>Lobby code: {code}</h2>
+            <h3>Players:</h3>
+            <ul>
+                {players.map(player => (
+                    <li key={player.id}>
+                        {player.name} {player.id === socket.id && "(You)"}
+                    </li>
+                ))}
+            </ul>
         </div>
     )
 }
