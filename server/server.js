@@ -22,25 +22,33 @@ app.get('/', (req, res) => {
 
 const gameRooms = new Map();
 
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+const createCode = () => {
+  return Math.random().toString(36).substring(2, 7);
+}
 
-  socket.on('joinGame', (playerName) => {
-    console.log(`${playerName} (${socket.id}) wants to join`);
-    
-    socket.emit('waitingForOpponent');
-  });
+io.on("connection", (socket) => {
+    socket.on("createLobby", () =>{
+        const code = createCode()
 
-  socket.on('submitAnswer', (data) => {
-    console.log('Answer submitted:', data);
-    
-  });
+        gameRooms.set(code, {
+          code: code,
+          players: [{ id: socket.id, name: "Host"}],
+          host: socket.id
+        })
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-    
-  });
-});
+        socket.join(code)
+        socket.emit("lobbyCreated", code)
+    })
+
+    socket.on("joinLobby", (code) => {
+      if (!gameRooms.has(code)){
+        socket.emit("lobbyNotFound")
+        return
+      }
+     
+      console.log("test")
+    })
+})
 
 const PORT = process.env.PORT || 3001;
 

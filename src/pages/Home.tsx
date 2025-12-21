@@ -18,10 +18,9 @@ export default function Home() {
   };
 
   const handleJoinLobby = () => {
-    if (lobbyCode.trim()) {
-      socket.emit("joinLobby", lobbyCode.toUpperCase());
-    }
+    return
   };
+
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -33,11 +32,6 @@ export default function Home() {
       navigate(`/lobby/${code}`);
     });
 
-    socket.on("lobbyJoined", (code) => {
-      console.log("Joined lobby", code);
-      navigate(`/lobby/${code}`);
-    });
-
     socket.on("error", (message) => {
       alert(message);
     });
@@ -45,7 +39,6 @@ export default function Home() {
     return () => {
       socket.off("connect");
       socket.off("lobbyCreated");
-      socket.off("lobbyJoined");
       socket.off("error");
     };
   }, [navigate]);
@@ -67,6 +60,7 @@ export default function Home() {
         />
       </div>
       <button onClick={handleJoinLobby}> Join Lobby </button>
+
     </div>
   );
 }
