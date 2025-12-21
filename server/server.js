@@ -45,8 +45,9 @@ io.on("connection", (socket) => {
         socket.emit("lobbyNotFound")
         return
       }
-     
-      console.log("test")
+      
+      socket.join(code)
+      socket.emit("lobbyJoined", code)
     })
 })
 

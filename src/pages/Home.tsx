@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   const handleJoinLobby = () => {
-    return
+    socket.emit("joinLobby", lobbyCode)
   };
 
 
@@ -32,6 +32,11 @@ export default function Home() {
       navigate(`/lobby/${code}`);
     });
 
+    socket.on("lobbyJoined", (code) => {
+        console.log("Lobby joined", code)
+        navigate(`/lobby/${code}`)
+    })
+
     socket.on("error", (message) => {
       alert(message);
     });
@@ -39,6 +44,7 @@ export default function Home() {
     return () => {
       socket.off("connect");
       socket.off("lobbyCreated");
+      socket.off("lobbyJoined")
       socket.off("error");
     };
   }, [navigate]);
