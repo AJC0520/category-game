@@ -21,6 +21,7 @@ export default function Lobby() {
             navigate("/")
         })
 
+        // Listens to player updates
         socket.on("playersUpdated", (updatedPlayers) => {
             setPlayers(updatedPlayers)
         })
