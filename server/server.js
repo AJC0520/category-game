@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { categories } from './data/sampleData.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Category Game Server is running!' });
 });
 
+
 const gameRooms = new Map();
 
 const createCode = () => {
@@ -33,7 +35,8 @@ io.on("connection", (socket) => {
         gameRooms.set(code, {
           code: code,
           players: [{ id: socket.id, name: "Host"}],
-          host: socket.id
+          host: socket.id,
+          gameResults: []
         })
 
         socket.join(code)
@@ -69,12 +72,50 @@ io.on("connection", (socket) => {
     socket.on("startGame", (code) => {
       const lobby = gameRooms.get(code)
 
+      if (!lobby) {
+        socket.emit("error", "Lobby not found")
+        return
+      }
+
       if (lobby.host !== socket.id) {
         socket.emit("error", "only host can start game")
         return
       }
 
-      io.to(code).emit("gameStarted")
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+      
+      
+      lobby.gameResults = []
+      
+      io.to(code).emit("gameStarted", {
+        category: randomCategory,
+        startTime: Date.now()
+      })
+    })
+
+    socket.on("gameFinished", ({ code, playerId, score, foundAnswers, totalAnswers }) => {
+      const lobby = gameRooms.get(code)
+
+      if (!lobby) {
+        socket.emit("error", "Lobby not found")
+        return
+      }
+      const existingResult = lobby.gameResults.find(r => r.playerId === playerId)
+      if (!existingResult) {
+        lobby.gameResults.push({
+          playerId,
+          playerName: lobby.players.find(p => p.id === playerId)?.name || "Unknown",
+          score,
+          foundAnswers,
+          totalAnswers
+        })
+      }
+
+      if (lobby.gameResults.length === lobby.players.length) {
+        const sortedResults = lobby.gameResults.sort((a, b) => b.score - a.score)
+      
+        io.to(code).emit("returnToLobby", sortedResults)
+      }
     })
 })
 

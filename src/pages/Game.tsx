@@ -1,11 +1,24 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import type { Category, Answer } from "../types/game.types"
 import { useEffect, useRef, useState } from "react"
+import { socket } from "../services/sockets"
+
 import "./Game.css"
 
 export default function Game(){
     const location = useLocation()
-    const category = location.state?.category as Category
+    const navigate = useNavigate()
+
+    // Handle both single-player and multiplayer data structures
+    const category = (location.state?.category || location.state?.gameData?.category) as Category
+    const isMultiplayer = !!location.state?.code
+    const lobbyCode = location.state?.code
+    const players = location.state?.players || []
+    
+    if (!category) {
+        return <div>Error: No game data available</div>
+    }
+    
     const answers = category.answers
 
     const [remainingAnswers, setRemainingAnswers] = useState<Answer[]>(category.answers)
@@ -23,6 +36,18 @@ export default function Game(){
     useEffect(() => {
         if (timer <= 0 || remainingAnswers.length === 0){
             setIsGameOver(true)
+            
+            // If multiplayer and timer ran out, send results to server
+            if (isMultiplayer && lobbyCode && timer <= 0) {
+                socket.emit("gameFinished", {
+                    code: lobbyCode,
+                    playerId: socket.id,
+                    score: totalScore,
+                    foundAnswers: foundAnswers.length,
+                    totalAnswers: answers.length
+                })
+            }
+            
             return
         }
 
@@ -31,7 +56,19 @@ export default function Game(){
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [timer, remainingAnswers.length])
+    }, [timer, remainingAnswers.length, isMultiplayer, lobbyCode, totalScore, foundAnswers, answers.length])
+
+    useEffect(() => {
+        if (!isMultiplayer) return
+
+        socket.on("returnToLobby", (gameResults) => {
+            navigate(`/lobby/${lobbyCode}`, { state: { gameResults } })
+        })
+
+        return () => {
+            socket.off("returnToLobby")
+        }
+    }, [isMultiplayer, lobbyCode, navigate])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(isGameOver) return

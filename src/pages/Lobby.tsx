@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { socket } from "../services/sockets"
 
 type Player = {
@@ -10,9 +10,12 @@ type Player = {
 export default function Lobby() {
     const { code } = useParams<{ code: string}>()
     const navigate = useNavigate()
+    const location = useLocation()
     const [players, setPlayers] = useState<Player[]>([])
     const [hostId, setHostId] = useState<string>("")
     const [player, setPlayer] = useState<Player | null>(null)
+    
+    const gameResults = location.state?.gameResults
 
     const isHost = socket.id === hostId
 
@@ -37,8 +40,9 @@ export default function Lobby() {
             setHostId(lobbyData.host)
         })
 
-        socket.on("gameStarted", () => {
+        socket.on("gameStarted", (gameData) => {
             console.log("game started for", player?.name)
+            navigate(`/game`, { state: { gameData, players, code } })
         })
 
         return () => {
@@ -58,6 +62,12 @@ export default function Lobby() {
             setPlayer(currentPlayer)
         }
     }, [players])
+
+    useEffect(() => {
+        if (gameResults) {
+            console.log("Game Results:", gameResults)
+        }
+    }, [gameResults])
 
     return(
         <div>
