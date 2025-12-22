@@ -11,7 +11,14 @@ export default function Lobby() {
     const { code } = useParams<{ code: string}>()
     const navigate = useNavigate()
     const [players, setPlayers] = useState<Player[]>([])
+    const [hostId, setHostId] = useState<string>("")
+    const [player, setPlayer] = useState<Player | null>(null)
 
+    const isHost = socket.id === hostId
+
+    const handleStartGame = () => {
+        socket.emit("startGame", code)
+    }
 
     useEffect(() => {
         socket.emit("joinLobby", code)
@@ -26,10 +33,28 @@ export default function Lobby() {
             setPlayers(updatedPlayers)
         })
 
+        socket.on("lobbyData", (lobbyData) => {
+            setHostId(lobbyData.host)
+        })
+
+        socket.on("gameStarted", () => {
+            console.log("game started for", player?.name)
+        })
+
+        players.forEach(player => {
+            if(player.id == socket.id){
+                setPlayer(player)
+            }
+
         return () => {
             socket.off("lobbyNotFound")
             socket.off("playersUpdated")
+            socket.off("lobbyData")
+            socket.off("gameStarted")
         }
+
+        });
+        
     }, [code, navigate])
     return(
         <div>
@@ -43,6 +68,9 @@ export default function Lobby() {
                     </li>
                 ))}
             </ul>
+            
+            {isHost && <button onClick={handleStartGame}>Start game</button>}
+
         </div>
     )
 }

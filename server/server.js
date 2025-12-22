@@ -61,7 +61,20 @@ io.on("connection", (socket) => {
       socket.join(code)
       socket.emit("lobbyJoined", code)
 
+      socket.emit("lobbyData", {host: lobby.host})
+
       io.to(code).emit("playersUpdated", lobby.players)
+    })
+
+    socket.on("startGame", (code) => {
+      const lobby = gameRooms.get(code)
+
+      if (lobby.host !== socket.id) {
+        socket.emit("error", "only host can start game")
+        return
+      }
+
+      io.to(code).emit("gameStarted")
     })
 })
 
