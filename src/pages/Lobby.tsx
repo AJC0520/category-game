@@ -41,21 +41,24 @@ export default function Lobby() {
             console.log("game started for", player?.name)
         })
 
-        players.forEach(player => {
-            if(player.id == socket.id){
-                setPlayer(player)
-            }
-
         return () => {
             socket.off("lobbyNotFound")
             socket.off("playersUpdated")
             socket.off("lobbyData")
             socket.off("gameStarted")
         }
-
-        });
         
     }, [code, navigate])
+
+
+    useEffect(() => {
+        const currentPlayer = players.find(p => p.id === socket.id)
+
+        if(currentPlayer){
+            setPlayer(currentPlayer)
+        }
+    }, [players])
+
     return(
         <div>
             <h1>Category game</h1>
