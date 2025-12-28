@@ -24,7 +24,7 @@ export default function Game(){
     const [remainingAnswers, setRemainingAnswers] = useState<Answer[]>(category.answers)
     const [totalScore, setTotalScore] = useState(0)
     const [foundAnswers, setFoundAnswers] = useState<Answer[]>([])
-    const [timer, setTimer] = useState(60)
+    const [timer, setTimer] = useState(30)
     const [isGameOver, setIsGameOver] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
@@ -43,7 +43,8 @@ export default function Game(){
                     code: lobbyCode,
                     playerId: socket.id,
                     score: totalScore,
-                    foundAnswers: foundAnswers.length,
+                    foundAnswers: foundAnswers,
+                    foundAnswersCount: foundAnswers.length,
                     totalAnswers: answers.length
                 })
             }

@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
       })
     })
 
-    socket.on("gameFinished", ({ code, playerId, score, foundAnswers, totalAnswers }) => {
+    socket.on("gameFinished", ({ code, playerId, score, foundAnswers, foundAnswersCount, totalAnswers }) => {
       const lobby = gameRooms.get(code)
 
       if (!lobby) {
@@ -107,6 +107,7 @@ io.on("connection", (socket) => {
           playerName: lobby.players.find(p => p.id === playerId)?.name || "Unknown",
           score,
           foundAnswers,
+          foundAnswersCount,
           totalAnswers
         })
       }
