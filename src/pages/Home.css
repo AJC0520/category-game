@@ -1,0 +1,10 @@
+.main-title {
+    font-size: 6rem;
+    padding: 0;
+    margin: 0;
+}
+
+.gamemode-selection {
+    display: flex;
+    justify-content: center;
+}
