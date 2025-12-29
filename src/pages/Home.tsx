@@ -3,8 +3,9 @@ import { categories } from "../data/sampledata";
 import { useEffect, useState } from "react";
 import { socket } from "../services/sockets";
 import TiltedCard from "../components/TiltedCard";
+
 import SinglePlayerIcon from "../assets/singleplayer_icon.png";
-import CreateLobbyIcon from "../assets/create_lobby_icon.png"
+import CreateLobbyIcon from "../assets/create_lobby_icon.png";
 
 import "./Home.css";
 
@@ -92,17 +93,20 @@ export default function Home() {
         </div>
       </div>
 
-      <div>
-        <p>Lobby code: </p>
-        <input
-          type="text"
-          value={lobbyCode}
-          onChange={(e) => setLobbyCode(e.target.value)}
-          placeholder="Enter code"
-          maxLength={5}
-        />
+      <div className="input-wrapper">
+        <h3> Do you have a code?</h3>
+        <div className="input-container">
+          <input
+            type="text"
+            value={lobbyCode}
+            onChange={(e) => setLobbyCode(e.target.value)}
+            placeholder="abcde"
+            maxLength={5}
+          />
+          <p onClick={handleJoinLobby}>Join lobby</p>
+        </div>
+
       </div>
-      <button onClick={handleJoinLobby}> Join Lobby </button>
     </div>
   );
 }
