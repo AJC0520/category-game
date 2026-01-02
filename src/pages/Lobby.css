@@ -46,3 +46,18 @@ ul {
     list-style: none;
     padding: 0;
 }
+
+.game-results-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.game-results-container > div {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}

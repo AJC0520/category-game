@@ -89,9 +89,16 @@ export default function Lobby() {
         ))}
       </ul>
 
-        {gameResults && <div className="game-results-container">
-            <ResultCard />
-        </div>}
+        {gameResults && gameResults.length > 0 && (
+          <div className="game-results-container">
+            <h2>Game Results</h2>
+            <div>
+              {gameResults.map((result: any, index: number) => (
+                <ResultCard key={result.playerId} gameResults={result} rank={index + 1} />
+              ))}
+            </div>
+          </div>
+        )}
     </div>
   );
 }
