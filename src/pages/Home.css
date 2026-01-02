@@ -27,7 +27,7 @@
 .input-container p {
     margin: 0;
     padding: 15px 25px;
-    background-color: #6366f1;
+    background-color: #292b6f;
     color: white;
     font-weight: 600;
     display: flex;
@@ -48,7 +48,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 4px;
-    c
+    font-family: 'Courier New', monospace;
     outline: none;
     text-align: center;
 }
@@ -60,12 +60,11 @@
 }
 
 .input-container p:hover {
-    background-color: #4f46e5;
+    background-color: #37338a;
 }
 
 
 .input-container p:active {
-    background-color: #4338ca;
     transform: scale(0.98);
 }
 
