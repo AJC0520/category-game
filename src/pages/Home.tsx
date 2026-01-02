@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import { categories } from "../data/sampledata";
 import { useEffect, useState } from "react";
 import { socket } from "../services/sockets";
 import TiltedCard from "../components/TiltedCard";
@@ -13,10 +12,18 @@ export default function Home() {
   const [lobbyCode, setLobbyCode] = useState("");
   const navigate = useNavigate();
 
-  const handleStart = () => {
-    const randomCategory =
-      categories[Math.floor(Math.random() * categories.length)];
-    return randomCategory;
+  const handleStart = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/random-category');
+      if (!response.ok) {
+        throw new Error('Failed to fetch category');
+      }
+      const category = await response.json();
+      navigate("/game", { state: { category } });
+    } catch (error) {
+      console.error('Error fetching category:', error);
+      alert('Failed to start game. Please try again.');
+    }
   };
 
   const handleCreateLobby = () => {
@@ -57,7 +64,7 @@ export default function Home() {
     <div>
       <h1 className="main-title">Obscurify</h1>
       <div className="gamemode-selection">
-        <Link to="/game" state={{ category: handleStart() }}>
+        <div onClick={handleStart}>
           <TiltedCard
             imageSrc={SinglePlayerIcon}
             altText="Singleplayer"
@@ -73,7 +80,7 @@ export default function Home() {
             displayOverlayContent={true}
             overlayContent={<p>Singleplayer</p>}
           />
-        </Link>
+        </div>
         <div onClick={handleCreateLobby}>
           <TiltedCard
             imageSrc={CreateLobbyIcon}

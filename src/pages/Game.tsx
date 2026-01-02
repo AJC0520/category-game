@@ -15,7 +15,7 @@ export default function Game(){
     const lobbyCode = location.state?.code
     const players = location.state?.players || []
     
-    if (!category) {
+    if (!category || !category.answers || category.answers.length === 0) {
         return <div>Error: No game data available</div>
     }
     
@@ -24,7 +24,7 @@ export default function Game(){
     const [remainingAnswers, setRemainingAnswers] = useState<Answer[]>(category.answers)
     const [totalScore, setTotalScore] = useState(0)
     const [foundAnswers, setFoundAnswers] = useState<Answer[]>([])
-    const [timer, setTimer] = useState(5)
+    const [timer, setTimer] = useState(60)
     const [isGameOver, setIsGameOver] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
@@ -90,8 +90,13 @@ export default function Game(){
 
     return(
         <div>
-            <h2>Time: {timer}s</h2>
-            <h1>Category: {category.name}</h1>
+            <h2>{timer}s</h2>
+            <div className="reverse-progress-container">
+                <div className="reverse-progress-bar" style={{ width: `${(timer / 60) * 100}%` }}></div>
+            </div>
+            <div className="category-information-container">
+                <h1>The category is... <span className="category-title"> {category.name} </span></h1>
+            </div>
             {isGameOver ? (
                 <div>
                     <h2>Game Over!</h2>
@@ -100,14 +105,13 @@ export default function Game(){
                 </div>
             ) : (
                 <>
-                    <p>What are the answers?</p>
-                    <input type="text" ref={inputRef} onChange={handleChange}/>
+                    <input type="text" ref={inputRef} onChange={handleChange} className="answer-input-field"/>
                     <p>Score: {totalScore}</p>
                     
                     {foundAnswers.map(answer => (
-                        <div className="display-answers" key={answer.text}>
+                        <div className={`display-answers score-${answer.obscurityScore}`} key={answer.text}>
                             <p>{answer.text}</p>
-                            <p>{answer.obscurityScore}</p>
+                            <p className="score-badge">+{answer.obscurityScore}</p>
                         </div>
                     ))}
                 </>
