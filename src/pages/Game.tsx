@@ -24,7 +24,7 @@ export default function Game(){
     const [remainingAnswers, setRemainingAnswers] = useState<Answer[]>(category.answers)
     const [totalScore, setTotalScore] = useState(0)
     const [foundAnswers, setFoundAnswers] = useState<Answer[]>([])
-    const [timer, setTimer] = useState(30)
+    const [timer, setTimer] = useState(5)
     const [isGameOver, setIsGameOver] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
