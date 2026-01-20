@@ -29,6 +29,23 @@ export default function Game(){
 
     const inputRef = useRef<HTMLInputElement>(null)
 
+    const handleStartNewGame = async () => {
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://10.22.62.179:3001';
+            const response = await fetch(`${API_URL}/api/random-category`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch category');
+            }
+            const newCategory = await response.json();
+            navigate("/game", { state: { category: newCategory }, replace: true });
+            // Reset game state
+            window.location.reload();
+        } catch (error) {
+            console.error('Error fetching category:', error);
+            alert('Failed to start new game. Please try again.');
+        }
+    };
+
     useEffect(() => {
         inputRef.current?.focus();
     }, [])
@@ -102,6 +119,7 @@ export default function Game(){
                     <h2>Game Over!</h2>
                     <p>Final Score: {totalScore}</p>
                     <p>Found {foundAnswers.length} out of {answers.length} answers</p>
+                    {!isMultiplayer && <button onClick={handleStartNewGame}>Start New Game</button>}
                 </div>
             ) : (
                 <>
@@ -116,6 +134,7 @@ export default function Game(){
                     ))}
                 </>
             )}
+
         </div>
     )
     

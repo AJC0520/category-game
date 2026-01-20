@@ -14,7 +14,8 @@ export default function Home() {
 
   const handleStart = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/random-category');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://10.22.62.179:3001';
+      const response = await fetch(`${API_URL}/api/random-category`);
       if (!response.ok) {
         throw new Error('Failed to fetch category');
       }
